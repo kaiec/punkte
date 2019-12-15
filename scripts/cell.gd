@@ -17,6 +17,7 @@ func _ready():
 	set_pickable(true)
 	connect_signal("mouse_entered", "_on_cell_mouse_entered")
 	connect_signal("mouse_exited", "_on_cell_mouse_exited")
+	connect_signal("input_event", "_on_cell_input_event")
 
 export var color = Color(1,1,1)
 
@@ -42,3 +43,10 @@ func _on_cell_mouse_entered():
 func _on_cell_mouse_exited():
 	highlight = false
 	update()
+
+func _on_cell_input_event(viewport, event, whatisthis):
+	if event is InputEventMouseButton:
+		if event.is_pressed():
+			print("click")
+		else:
+			print("released")
