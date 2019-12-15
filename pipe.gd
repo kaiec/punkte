@@ -7,5 +7,6 @@ func _ready():
 
 func _draw():
 	if highlight:
-		draw_circle(size / 2, size.x * 0.42, Color(1,1,1))
-	draw_circle(size / 2, size.x * 0.4, color)
+		draw_circle(size / 2, size.x * 0.22, Color(1,1,1))
+	draw_circle(size / 2, size.x * 0.2, color)
+

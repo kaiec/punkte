@@ -2,7 +2,7 @@ extends Node2D
 
 onready var dot = preload('res://dot.tscn')
 
-var cell_size = Vector2(64,64)
+var cell_size = Vector2(100,100)
 var grid_size = Vector2(5,5)
 var grid_pos = Vector2(10,10)
 
@@ -37,7 +37,8 @@ func _draw():
 
 func set_dot(pos,color):
 	var newdot = dot.instance()
-	newdot.position = grid_pos + pos * cell_size
+	newdot.set_size(cell_size)
+	newdot.set_position(grid_pos + pos * cell_size)
 	newdot.color = color
 	add_child(newdot)
 	return newdot
