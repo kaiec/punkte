@@ -6,17 +6,27 @@ extends KinematicBody2D
 export var size = Vector2(64,64)
 var highlight = false
 
+
+func connect_signal(sig, fun):
+	var err = connect(sig, self, fun)
+	if (err):
+		print("Error connecting {} to {} in {}".format([sig, fun, self]))
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	set_pickable(true)
-	connect("mouse_entered", self, "_on_cell_mouse_entered")
-	connect("mouse_exited", self, "_on_cell_mouse_exited")
+	connect_signal("mouse_entered", "_on_cell_mouse_entered")
+	connect_signal("mouse_exited", "_on_cell_mouse_exited")
 
-export var color = Color(.282, .757, .255)
+export var color = Color(1,1,1)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
 #	pass
+
+func set_color(new_color):
+	color = new_color
+	update()
 
 func set_size(new_size):
 	size = new_size

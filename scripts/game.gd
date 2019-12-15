@@ -1,7 +1,7 @@
 extends Node2D
 
-onready var dot = preload('res://dot.tscn')
-onready var pipe = preload('res://pipe.tscn')
+onready var dot = preload('res://scenes/dot.tscn')
+onready var pipe = preload('res://scenes/pipe.tscn')
 
 var cell_size = Vector2(100,100)
 var grid_size = Vector2(5,5)
