@@ -22,10 +22,12 @@ func _ready():
 		grid.append([])
 		for y in range(grid_size.y):
 			grid[x].append(0)
-
-	var green = dot.instance()
-	green.position = Vector2(10,10)
-	add_child(green)
+	set_dot(Vector2(0,0), colors.GREEN)
+	set_dot(Vector2(4,4), colors.GREEN)
+	set_dot(Vector2(0,4), colors.BLUE)
+	set_dot(Vector2(3,1), colors.BLUE)
+	
+	
 			
 func _draw():
 	for x in range(grid_size.x):
@@ -33,3 +35,9 @@ func _draw():
 			var p = Vector2(x,y)
 			draw_rect(Rect2(grid_pos + p * cell_size, cell_size), colors.WHITE, false) 
 
+func set_dot(pos,color):
+	var newdot = dot.instance()
+	newdot.position = grid_pos + pos * cell_size
+	newdot.color = color
+	add_child(newdot)
+	return newdot
