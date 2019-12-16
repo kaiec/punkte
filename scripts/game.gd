@@ -17,6 +17,7 @@ var colors = {
 
 var grid = {}
 
+
 func _ready():
 	print('Game started')
 	for x in range(grid_size.x):
@@ -42,6 +43,8 @@ func set_cell(pos,cell,color):
 	var newcell = cell.instance()
 	newcell.set_size(cell_size)
 	newcell.set_position(grid_pos + pos * cell_size)
+	newcell.game_position = pos
+	newcell.game = self
 	newcell.color = color
 	add_child(newcell)
 	grid[pos] = newcell

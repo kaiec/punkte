@@ -1,16 +1,17 @@
 extends KinematicBody2D
 
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
 export var size = Vector2(64,64)
+export var color = Color(1,1,1)
+
+var game = null
+var game_position = null
 var highlight = false
 
 
 func connect_signal(sig, fun):
 	var err = connect(sig, self, fun)
 	if (err):
-		print("Error connecting {} to {} in {}".format([sig, fun, self]))
+		print("Error connecting %s to %s in %s" % [sig, fun, self])
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -19,7 +20,7 @@ func _ready():
 	connect_signal("mouse_exited", "_on_cell_mouse_exited")
 	connect_signal("input_event", "_on_cell_input_event")
 
-export var color = Color(1,1,1)
+
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 #func _process(delta):
@@ -47,6 +48,6 @@ func _on_cell_mouse_exited():
 func _on_cell_input_event(viewport, event, whatisthis):
 	if event is InputEventMouseButton:
 		if event.is_pressed():
-			print("click")
+			print("click %s" % game_position)
 		else:
-			print("released")
+			print("released %s" % game_position)
