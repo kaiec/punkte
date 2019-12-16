@@ -16,7 +16,7 @@ var colors = {
 }
 
 var grid = {}
-
+var pipe_start = null
 
 func _ready():
 	print('Game started')

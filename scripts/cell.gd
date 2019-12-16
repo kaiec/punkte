@@ -6,7 +6,7 @@ export var color = Color(1,1,1)
 var game = null
 var game_position = null
 var highlight = false
-
+var empty = true
 
 func connect_signal(sig, fun):
 	var err = connect(sig, self, fun)
@@ -38,6 +38,8 @@ func set_size(new_size):
 
 func _on_cell_mouse_entered():
 	highlight = true
+	if game.pipe_start:
+		empty = false
 	update()
 
 
@@ -48,6 +50,11 @@ func _on_cell_mouse_exited():
 func _on_cell_input_event(viewport, event, whatisthis):
 	if event is InputEventMouseButton:
 		if event.is_pressed():
-			print("click %s" % game_position)
+			if empty:
+				return
+			game.pipe_start = self
+			print("start %s" % game_position)
 		else:
-			print("released %s" % game_position)
+			if game.pipe_start:
+				game.pipe_start = null
+				print("end %s" % game_position)

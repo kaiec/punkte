@@ -1,9 +1,9 @@
 extends "res://scripts/cell.gd"
 
 
-# Called when the node enters the scene tree for the first time.
+
 func _ready():
-	pass
+	empty = false # a dot is by default not empty
 
 func _draw():
 	if highlight:
