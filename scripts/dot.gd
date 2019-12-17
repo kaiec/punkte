@@ -9,3 +9,7 @@ func _draw():
 	if highlight:
 		draw_circle(size / 2, size.x * 0.42, Color(1,1,1))
 	draw_circle(size / 2, size.x * 0.4, color)
+	if upstream:
+		draw_connection(upstream)
+	if downstream:
+		draw_connection(downstream)
