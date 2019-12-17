@@ -3,9 +3,9 @@ extends Node2D
 onready var dot = preload('res://scenes/dot.tscn')
 onready var pipe = preload('res://scenes/pipe.tscn')
 
-var cell_size = Vector2(100,100)
-var grid_size = Vector2(5,5)
-var grid_pos = Vector2(10,10)
+var cell_size = Vector2(36,36)
+var grid_size = Vector2(7,7)
+var grid_pos = Vector2(10,100)
 var dumpcell = false
 
 var colors = {
@@ -22,7 +22,7 @@ var pipe_last = null
 var pipe_current = null
 
 func _ready():
-	print('Game started')
+	print_debug('Game started')
 	for x in range(grid_size.x):
 		for y in range(grid_size.y):
 			grid[Vector2(x,y)] = null
@@ -65,5 +65,5 @@ func _unhandled_input(event):
 			for cell in grid.values():
 				cell.update()
 		if event.pressed and event.scancode == KEY_D:
-			print('click on a cell to dump it')
+			print_debug('click on a cell to dump it')
 			dumpcell = true

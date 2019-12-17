@@ -89,12 +89,12 @@ func find_start(cell):
 func end_pipe():
 	game.pipe_start = null
 	game.pipe_last = null
-	print("end %s" % game_position)
+	print_debug("end %s" % game_position)
 	
 func start_pipe():
 	game.pipe_start = find_start(self)
 	game.pipe_last = self
-	print("start %s" % game_position)
+	print_debug("start %s" % game_position)
 
 
 func _on_cell_mouse_entered():
@@ -106,24 +106,24 @@ func _on_cell_mouse_entered():
 		if dot and color != game.pipe_last.color: # we hit a foreign dot
 			return end_pipe()
 		if not empty and color != game.pipe_start.color: # we hit other pipe
-			print('hit other pipe')
+			print_debug('hit other pipe')
 			empty_downstream()
 			empty_cell()
 			self.upstream = game.pipe_last
 			game.pipe_last.downstream = self
 		elif not empty: # we hit ourself or draw backwards or reached a dot
 			if not dot:  # we continue from here and do not reconnect upstream
-				print('hit ourselves, restart from here')
+				print_debug('hit ourselves, restart from here')
 				empty_downstream()
 			else: 
 				# if it is our own starting point, do not connect and end
 				if find_start(game.pipe_last) == self:
-					print('reached starting dot')
+					print_debug('reached starting dot')
 					if downstream and game.pipe_last == downstream: # we came backwards
 						empty_downstream()
 					return end_pipe()
 			    # everything ok, we properly connect it to the pipe
-				print('reached other dot')
+				print_debug('reached other dot')
 				self.upstream = game.pipe_last
 				game.pipe_last.downstream = self
 		else: # we have an empty cell
