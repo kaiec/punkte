@@ -54,6 +54,8 @@ func _on_cell_mouse_entered():
 			game.pipe_last = null
 			print("end %s" % game_position)
 			return
+		if not empty:
+			empty_downstream()
 		empty = false
 		self.upstream = game.pipe_last
 		game.pipe_last.downstream = self
@@ -61,6 +63,16 @@ func _on_cell_mouse_entered():
 		self.color = game.pipe_start.color
 	update()
 
+
+func empty_downstream():
+	self.empty = true
+	if self.upstream:
+		self.upstream.downstream = null
+		self.upstream = null
+	if self.downstream:
+		self.downstream.empty_downstream()
+		self.downstream = false
+	
 
 func _on_cell_mouse_exited():
 	highlight = false
