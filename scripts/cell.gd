@@ -6,9 +6,11 @@ export var color = Color(1,1,1) setget set_color
 var game = null
 var game_position = null
 var highlight = false
-var empty = true
+var dot = false
+var empty = true setget set_empty
 var upstream = null setget set_upstream
 var downstream = null setget set_downstream
+
 
 func connect_signal(sig, fun):
 	var err = connect(sig, self, fun)
@@ -23,10 +25,8 @@ func _ready():
 	connect_signal("input_event", "_on_cell_input_event")
 
 
-
-# Called every frame. 'delta' is the elapsed time since the previous frame.
-#func _process(delta):
-#	pass
+func set_empty(new_empty):
+	empty = new_empty
 
 func set_upstream(new_upstream):
 	upstream = new_upstream
@@ -54,6 +54,11 @@ func _on_cell_mouse_entered():
 			game.pipe_last = null
 			print("end %s" % game_position)
 			return
+		if dot and color != game.pipe_last.color:
+			game.pipe_start = null
+			game.pipe_last = null
+			print("end %s" % game_position)
+			return
 		if not empty:
 			empty_downstream()
 		empty = false
@@ -61,6 +66,11 @@ func _on_cell_mouse_entered():
 		game.pipe_last.downstream = self
 		game.pipe_last = self
 		self.color = game.pipe_start.color
+		if dot:
+			game.pipe_start = null
+			game.pipe_last = null
+			print("end %s" % game_position)
+			return
 	update()
 
 
@@ -71,8 +81,16 @@ func empty_downstream():
 		self.upstream = null
 	if self.downstream:
 		self.downstream.empty_downstream()
-		self.downstream = false
-	
+		self.downstream = null
+
+func empty_upstream():
+	self.empty = true
+	if self.upstream:
+		self.upstream.empty_upstream()
+		self.upstream = null
+	if self.downstream:
+		self.downstream.upstream = null
+		self.downstream = null	
 
 func _on_cell_mouse_exited():
 	highlight = false
@@ -83,6 +101,10 @@ func _on_cell_input_event(viewport, event, whatisthis):
 		if event.is_pressed():
 			if empty:
 				return
+			if downstream:
+				downstream.empty_downstream()
+			if dot and upstream:
+				upstream.empty_upstream()
 			game.pipe_start = self
 			game.pipe_last = self
 			print("start %s" % game_position)

@@ -1,8 +1,9 @@
 extends "res://scripts/cell.gd"
-
+class_name Dot
 
 
 func _ready():
+	dot = true
 	empty = false # a dot is by default not empty
 
 func _draw():
@@ -13,3 +14,6 @@ func _draw():
 		draw_connection(upstream)
 	if downstream:
 		draw_connection(downstream)
+		
+func set_empty(new_empty):
+	return

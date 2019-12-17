@@ -1,5 +1,5 @@
 extends "res://scripts/cell.gd"
-
+class_name Pipe
 
 func _ready():
 	pass
