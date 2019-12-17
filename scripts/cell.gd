@@ -49,6 +49,11 @@ func set_size(new_size):
 func _on_cell_mouse_entered():
 	highlight = true
 	if game.pipe_start:
+		if not is_neighbour(game.pipe_last):
+			game.pipe_start = null
+			game.pipe_last = null
+			print("end %s" % game_position)
+			return
 		empty = false
 		self.upstream = game.pipe_last
 		game.pipe_last.downstream = self
@@ -75,6 +80,14 @@ func _on_cell_input_event(viewport, event, whatisthis):
 				game.pipe_last = null
 				print("end %s" % game_position)
 				
+
+func is_neighbour(cell):
+	return abs(game_position.x - cell.game_position.x) == 1 and \
+				abs(game_position.y - cell.game_position.y) == 0 or \
+		  		abs(game_position.x - cell.game_position.x) == 0 and \
+				abs(game_position.y - cell.game_position.y) == 1
+
+
 func draw_connection(cell):
 	# a rectangle with same thickness as internal dot that connects seamlessly to the dot.
 	# from left:
