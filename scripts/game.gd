@@ -6,6 +6,7 @@ onready var pipe = preload('res://scenes/pipe.tscn')
 var cell_size = Vector2(100,100)
 var grid_size = Vector2(5,5)
 var grid_pos = Vector2(10,10)
+var dumpcell = false
 
 var colors = {
 	WHITE = Color(1.0, 1.0, 1.0),
@@ -18,27 +19,32 @@ var colors = {
 var grid = {}
 var pipe_start = null
 var pipe_last = null
+var pipe_current = null
 
 func _ready():
 	print('Game started')
 	for x in range(grid_size.x):
 		for y in range(grid_size.y):
 			grid[Vector2(x,y)] = null
-	set_cell(Vector2(0,0), dot, colors.GREEN)
-	set_cell(Vector2(4,4), dot,  colors.GREEN)
-	set_cell(Vector2(0,4), dot,  colors.BLUE)
-	set_cell(Vector2(3,1), dot,  colors.BLUE)
+	set_dots(Vector2(0,0), Vector2(4,4), colors.GREEN)
+	set_dots(Vector2(0,4), Vector2(3,1),  colors.BLUE)
 	for x in range(grid_size.x):
 		for y in range(grid_size.y):
 			if grid[Vector2(x,y)] == null:
 				set_cell(Vector2(x,y), pipe, colors.YELLOW)
-	
+
 			
 func _draw():
 	for x in range(grid_size.x):
 		for y in range(grid_size.y):
 			var p = Vector2(x,y)
 			draw_rect(Rect2(grid_pos + p * cell_size, cell_size), colors.WHITE, false) 
+
+func set_dots(pos1, pos2, color):
+	var dot1 = set_cell(pos1, dot, color)
+	var dot2 = set_cell(pos2, dot, color)
+	dot1.other = dot2
+	dot2.other = dot1
 
 func set_cell(pos,cell,color):
 	var newcell = cell.instance()
@@ -50,3 +56,14 @@ func set_cell(pos,cell,color):
 	add_child(newcell)
 	grid[pos] = newcell
 	return newcell
+	
+	
+func _unhandled_input(event):
+	if event is InputEventKey:
+		if event.pressed and event.scancode == KEY_R:
+			print('refresh')
+			for cell in grid.values():
+				cell.update()
+		if event.pressed and event.scancode == KEY_D:
+			print('click on a cell to dump it')
+			dumpcell = true

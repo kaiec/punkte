@@ -1,7 +1,6 @@
 extends "res://scripts/cell.gd"
 class_name Dot
 
-
 func _ready():
 	dot = true
 	empty = false # a dot is by default not empty

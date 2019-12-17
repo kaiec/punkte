@@ -7,6 +7,7 @@ var game = null
 var game_position = null
 var highlight = false
 var dot = false
+var other = null
 var empty = true setget set_empty
 var upstream = null setget set_upstream
 var downstream = null setget set_downstream
@@ -27,6 +28,7 @@ func _ready():
 
 func set_empty(new_empty):
 	empty = new_empty
+	update()
 
 func set_upstream(new_upstream):
 	upstream = new_upstream
@@ -46,51 +48,94 @@ func set_size(new_size):
 	get_node("CollisionShape2D").set_position(new_size/2)
 	update()
 
+func empty_cell():
+	if self.upstream:
+		self.upstream.downstream = null
+	if self.downstream:
+		self.downstream.upstream = null
+	self.upstream = null
+	self.downstream = null
+	if not dot:
+		self.empty = true
+		self.color = Color(1,1,1)
+
+func empty_downstream(origin=null):
+	if origin == self:
+		return;
+	var o = origin
+	if not o:
+		o = self
+	if self.downstream:
+		self.downstream.empty_downstream(o)
+	if origin != null:
+		empty_cell()
+
+func empty_upstream(origin=null):
+	if origin == self:
+		return;
+	var o = origin
+	if not o:
+		o = self
+	if self.upstream:
+		self.upstream.empty_upstream(o)
+	if origin != null:
+		empty_cell()
+
+func find_start(cell):
+	if not cell.upstream:
+		return cell
+	return cell.upstream.find_start(cell.upstream)
+
+func end_pipe():
+	game.pipe_start = null
+	game.pipe_last = null
+	print("end %s" % game_position)
+	
+func start_pipe():
+	game.pipe_start = find_start(self)
+	game.pipe_last = self
+	print("start %s" % game_position)
+
+
 func _on_cell_mouse_entered():
 	highlight = true
+	game.pipe_current = self
 	if game.pipe_start:
-		if not is_neighbour(game.pipe_last):
-			game.pipe_start = null
-			game.pipe_last = null
-			print("end %s" % game_position)
-			return
-		if dot and color != game.pipe_last.color:
-			game.pipe_start = null
-			game.pipe_last = null
-			print("end %s" % game_position)
-			return
-		if not empty:
+		if not is_neighbour(game.pipe_last): # we accidently skipped a cell
+			return end_pipe()
+		if dot and color != game.pipe_last.color: # we hit a foreign dot
+			return end_pipe()
+		if not empty and color != game.pipe_start.color: # we hit other pipe
+			print('hit other pipe')
 			empty_downstream()
+			empty_cell()
+			self.upstream = game.pipe_last
+			game.pipe_last.downstream = self
+		elif not empty: # we hit ourself or draw backwards or reached a dot
+			if not dot:  # we continue from here and do not reconnect upstream
+				print('hit ourselves, restart from here')
+				empty_downstream()
+			else: 
+				# if it is our own starting point, do not connect and end
+				if find_start(game.pipe_last) == self:
+					print('reached starting dot')
+					if downstream and game.pipe_last == downstream: # we came backwards
+						empty_downstream()
+					return end_pipe()
+			    # everything ok, we properly connect it to the pipe
+				print('reached other dot')
+				self.upstream = game.pipe_last
+				game.pipe_last.downstream = self
+		else: # we have an empty cell
+			game.pipe_last.downstream = self
+			self.upstream = game.pipe_last
 		empty = false
-		self.upstream = game.pipe_last
-		game.pipe_last.downstream = self
 		game.pipe_last = self
 		self.color = game.pipe_start.color
 		if dot:
-			game.pipe_start = null
-			game.pipe_last = null
-			print("end %s" % game_position)
-			return
+			end_pipe()
 	update()
 
-
-func empty_downstream():
-	self.empty = true
-	if self.upstream:
-		self.upstream.downstream = null
-		self.upstream = null
-	if self.downstream:
-		self.downstream.empty_downstream()
-		self.downstream = null
-
-func empty_upstream():
-	self.empty = true
-	if self.upstream:
-		self.upstream.empty_upstream()
-		self.upstream = null
-	if self.downstream:
-		self.downstream.upstream = null
-		self.downstream = null	
 
 func _on_cell_mouse_exited():
 	highlight = false
@@ -99,21 +144,38 @@ func _on_cell_mouse_exited():
 func _on_cell_input_event(viewport, event, whatisthis):
 	if event is InputEventMouseButton:
 		if event.is_pressed():
+			if game.dumpcell:
+				dump_cell()
+				game.dumpcell = false
+				return
+			game.pipe_current = self
 			if empty:
 				return
 			if downstream:
-				downstream.empty_downstream()
-			if dot and upstream:
-				upstream.empty_upstream()
-			game.pipe_start = self
-			game.pipe_last = self
-			print("start %s" % game_position)
+				empty_downstream()
+			if dot:
+				empty_upstream()
+				other.empty_upstream()
+				other.empty_downstream()
+			start_pipe()
 		else:
+			game.pipe_current = self
 			if game.pipe_start:
-				game.pipe_start = null
-				game.pipe_last = null
-				print("end %s" % game_position)
-				
+				end_pipe()
+
+func dump_cell():
+	print("game pos %s" % game_position)
+	print("empty %s" % empty)
+	if upstream:
+		print("upstream %s" % upstream.game_position)
+	else:
+		print("no upstream")
+	if downstream:
+		print("downstream %s" % downstream.game_position)
+	else:
+		print("no downstream")
+	print("dot %s" % dot)
+	print("color %s" % color)
 
 func is_neighbour(cell):
 	return abs(game_position.x - cell.game_position.x) == 1 and \
@@ -133,3 +195,4 @@ func draw_connection(cell):
 		draw_rect(Rect2(Vector2(size.x / 2 - 0.22 * size.x, 0), Vector2(2*(size.x * 0.22), size.y/2)), color)
 	elif cell.position.y > position.y:
 		draw_rect(Rect2(Vector2(size.x / 2 - 0.22 * size.x, size.y / 2), Vector2(2*(size.x * 0.22), size.y/2)), color)
+
