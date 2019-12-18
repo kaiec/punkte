@@ -17,6 +17,7 @@ var colors = {
 }
 
 var grid = {}
+var grid_rect = Rect2(Vector2(0,0), Vector2(0,0))
 var pipe_start = null
 var pipe_last = null
 var pipe_current = null
@@ -32,13 +33,51 @@ func _ready():
 		for y in range(grid_size.y):
 			if grid[Vector2(x,y)] == null:
 				set_cell(Vector2(x,y), pipe, colors.YELLOW)
-
+	grid_rect.position = grid_pos
+	grid_rect.size = grid_size * cell_size
 			
 func _draw():
 	for x in range(grid_size.x):
 		for y in range(grid_size.y):
 			var p = Vector2(x,y)
 			draw_rect(Rect2(grid_pos + p * cell_size, cell_size), colors.WHITE, false) 
+
+func game_pos(pos):
+	return ((pos - grid_pos) / cell_size).floor()
+	
+func _process(delta):
+	if Input.is_mouse_button_pressed(BUTTON_LEFT):
+		var mp = get_global_mouse_position()
+		if grid_rect.has_point(mp):
+			var gp = game_pos(mp)
+			if grid[gp] != pipe_current:
+				pipe_current = grid[gp]
+				if not pipe_start:
+					grid[gp].try_start_pipe()
+				else:
+					grid[gp].try_connect_to_pipe()
+	else:
+		if pipe_start:
+			end_pipe()			
+
+func end_pipe():
+	if pipe_last:
+		print_debug("end %s" % pipe_last.game_position)
+	else:
+		print('end with no last pos')
+	pipe_start = null
+	pipe_last = null
+	
+func start_pipe():
+	pipe_start = find_start(pipe_current)
+	pipe_last = pipe_current
+	print_debug("start %s" % pipe_current.game_position)
+
+func find_start(cell):
+	if not cell.upstream:
+		return cell
+	return find_start(cell.upstream)
+
 
 func set_dots(pos1, pos2, color):
 	var dot1 = set_cell(pos1, dot, color)
