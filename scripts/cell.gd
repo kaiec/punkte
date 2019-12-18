@@ -20,11 +20,7 @@ func connect_signal(sig, fun):
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	set_pickable(true)
-#	connect_signal("mouse_entered", "_on_cell_mouse_entered")
-#	connect_signal("mouse_exited", "_on_cell_mouse_exited")
-#	connect_signal("input_event", "_on_cell_input_event")
-
+	pass
 
 func set_empty(new_empty):
 	empty = new_empty
@@ -131,33 +127,6 @@ func try_connect_to_pipe():
 	self.color = game.pipe_start.color
 	if dot:
 		game.end_pipe()
-
-
-
-func _on_cell_mouse_entered():
-	highlight = true
-	game.pipe_current = self
-	if game.pipe_start:
-		try_connect_to_pipe()
-	update()
-
-
-func _on_cell_mouse_exited():
-	highlight = false
-	update()
-
-func _on_cell_input_event(viewport, event, whatisthis):
-	if event is InputEventMouseButton:
-		if event.is_pressed():
-			if game.dumpcell:
-				dump_cell()
-				game.dumpcell = false
-				return
-			try_start_pipe()
-		else:
-			game.pipe_current = self
-			if game.pipe_start:
-				game.end_pipe()
 
 func dump_cell():
 	print("game pos %s" % game_position)
