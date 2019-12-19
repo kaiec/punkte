@@ -1,6 +1,6 @@
 extends Node2D
 
-
+var icon = preload("res://assets/icon.png")
 
 func _ready():
 	pass	
@@ -9,8 +9,8 @@ func _ready():
 var pos = Vector2(0,0)
 			
 func _draw():
-		draw_circle(get_local_mouse_position(), 15, Color(1,1,1))
+		draw_texture(icon, get_local_mouse_position()-Vector2(32,32))
 
 	
-func _physics_process(delta):
+func _process(delta):
 	update()
