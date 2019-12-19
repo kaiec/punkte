@@ -14,8 +14,3 @@ func _draw():
 	
 func _physics_process(delta):
 	update()
-	
-func _input(event):
-	if event is InputEventScreenDrag:
-		position = event.position
-
