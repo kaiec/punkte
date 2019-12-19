@@ -29,7 +29,7 @@ func clear(from = null):
 func add(cell):
 	var last = get_last()
 	if not last.is_neighbour(cell):
-		print_debug('not a neighbour, can not add to line')
+		# print_debug('not a neighbour, can not add to line')
 		return
 	if cell.dot and cell.line != self: # we hit another dot
 		return
@@ -49,12 +49,12 @@ func add(cell):
 		end()
 		
 func end():
-	print_debug("end %s" % get_last().game_position)
+	# print_debug("end %s" % get_last().game_position)
 	game.active_line = null
 	
 func start(cell):
 	game.active_line = self
-	print_debug("start %s" % cell.game_position)
+	# print_debug("start %s" % cell.game_position)
 	if cell.dot:
 		clear()
 		start_dot = cell

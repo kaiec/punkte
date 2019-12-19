@@ -44,22 +44,32 @@ func _draw():
 			draw_rect(Rect2(grid_pos + p * cell_size, cell_size), colors.WHITE, false) 
 
 func game_pos(pos):
-	return ((pos - grid_pos) / cell_size).floor()
+	var gp_float = ((pos - grid_pos) / cell_size)
+	var gp = gp_float.floor()
+	var excenter = (gp_float - gp - Vector2(0.5, 0.5)).length_squared()
+	# print('%s, %s, %s' % [gp_float, gp, excenter])
+	if excenter > 0.16:
+		return null
+	else:
+		return gp
+	
 	
 func _process(delta):
 	if Input.is_mouse_button_pressed(BUTTON_LEFT):
 		var mp = get_global_mouse_position()
 		if grid_rect.has_point(mp):
 			var gp = game_pos(mp)
-			if grid[gp] != active_cell:
-				active_cell = grid[gp]
-				if not active_line:
+			if gp != null and grid[gp] != active_cell:
+				if not active_cell and not active_line:
+					active_cell = grid[gp]
 					grid[gp].try_start_pipe()
 				else:
+					active_cell = grid[gp]
 					grid[gp].try_connect_to_pipe()
 	else:
 		if active_line:
 			active_line.end()
+		active_cell = null
 
 
 func create_line(pos1, pos2, color):
