@@ -11,31 +11,29 @@ var other = null
 var empty = true setget set_empty
 var upstream = null setget set_upstream
 var downstream = null setget set_downstream
+var line = null setget set_line
 
-
-func connect_signal(sig, fun):
-	var err = connect(sig, self, fun)
-	if (err):
-		print("Error connecting %s to %s in %s" % [sig, fun, self])
-
-# Called when the node enters the scene tree for the first time.
 func _ready():
 	pass
 
-func set_empty(new_empty):
-	empty = new_empty
+func set_empty(value):
+	empty = value
 	update()
 
-func set_upstream(new_upstream):
-	upstream = new_upstream
+func set_upstream(value):
+	upstream = value
 	update()
 
-func set_downstream(new_downstream):
-	downstream = new_downstream
+func set_downstream(value):
+	downstream = value
 	update()
 
-func set_color(new_color):
-	color = new_color
+func set_color(value):
+	color = value
+	update()
+	
+func set_line(value):
+	line = value
 	update()
 
 func set_size(new_size):
@@ -54,80 +52,21 @@ func empty_cell():
 	if not dot:
 		self.empty = true
 		self.color = Color(1,1,1)
-
-func empty_downstream(origin=null):
-	if origin == self:
-		return;
-	var o = origin
-	if not o:
-		o = self
-	if self.downstream:
-		self.downstream.empty_downstream(o)
-	if origin != null:
-		empty_cell()
-
-func empty_upstream(origin=null):
-	if origin == self:
-		return;
-	var o = origin
-	if not o:
-		o = self
-	if self.upstream:
-		self.upstream.empty_upstream(o)
-	if origin != null:
-		empty_cell()
-
-
+		self.line = null
 
 
 func try_start_pipe():
-	game.pipe_current = self
-	if empty:
+	if not line: # can only start on an existing line
 		return
-	if downstream:
-		empty_downstream()
-	if dot:
-		empty_upstream()
-		other.empty_upstream()
-		other.empty_downstream()
-	game.start_pipe()
+	else:
+		line.start(self)
 
 
+		
 func try_connect_to_pipe():
-	if not is_neighbour(game.pipe_last): # we accidently skipped a cell
-		return game.end_pipe()
-	if dot and color != game.pipe_last.color: # we hit a foreign dot
-		return game.end_pipe()
-	if not empty and color != game.pipe_start.color: # we hit other pipe
-		print_debug('hit other pipe')
-		empty_downstream()
-		empty_cell()
-		self.upstream = game.pipe_last
-		game.pipe_last.downstream = self
-	elif not empty: # we hit ourself or draw backwards or reached a dot
-		if not dot:  # we continue from here and do not reconnect upstream
-			print_debug('hit ourselves, restart from here')
-			empty_downstream()
-		else: 
-			# if it is our own starting point, do not connect and end
-			if game.find_start(game.pipe_last) == self:
-				print_debug('reached starting dot')
-				if downstream and game.pipe_last == downstream: # we came backwards
-					empty_downstream()
-				return game.end_pipe()
-		    # everything ok, we properly connect it to the pipe
-			print_debug('reached other dot')
-			self.upstream = game.pipe_last
-			game.pipe_last.downstream = self
-	else: # we have an empty cell
-		game.pipe_last.downstream = self
-		self.upstream = game.pipe_last
-	empty = false
-	game.pipe_last = self
-	self.color = game.pipe_start.color
-	if dot:
-		game.end_pipe()
-
+	if game.active_line:
+		game.active_line.add(self)
+		
 func dump_cell():
 	print("game pos %s" % game_position)
 	print("empty %s" % empty)

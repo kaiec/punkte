@@ -1,7 +1,8 @@
 extends Node2D
 
-onready var dot = preload('res://scenes/dot.tscn')
-onready var pipe = preload('res://scenes/pipe.tscn')
+const Dot = preload('res://scenes/dot.tscn')
+const Pipe = preload('res://scenes/pipe.tscn')
+const Line = preload('res://scripts/line.gd')
 
 var cell_size = Vector2(36,36)
 var grid_size = Vector2(7,7)
@@ -18,21 +19,21 @@ var colors = {
 
 var grid = {}
 var grid_rect = Rect2(Vector2(0,0), Vector2(0,0))
-var pipe_start = null
-var pipe_last = null
-var pipe_current = null
+var lines = []
+var active_line = null
+var active_cell = null
 
 func _ready():
 	print_debug('Game started')
 	for x in range(grid_size.x):
 		for y in range(grid_size.y):
 			grid[Vector2(x,y)] = null
-	set_dots(Vector2(0,0), Vector2(4,4), colors.GREEN)
-	set_dots(Vector2(0,4), Vector2(3,1),  colors.BLUE)
+	create_line(Vector2(0,0), Vector2(4,4), colors.GREEN)
+	create_line(Vector2(0,4), Vector2(3,1),  colors.BLUE)
 	for x in range(grid_size.x):
 		for y in range(grid_size.y):
 			if grid[Vector2(x,y)] == null:
-				set_cell(Vector2(x,y), pipe, colors.YELLOW)
+				set_cell(Vector2(x,y), Pipe, colors.YELLOW)
 	grid_rect.position = grid_pos
 	grid_rect.size = grid_size * cell_size
 			
@@ -50,40 +51,29 @@ func _process(delta):
 		var mp = get_global_mouse_position()
 		if grid_rect.has_point(mp):
 			var gp = game_pos(mp)
-			if grid[gp] != pipe_current:
-				pipe_current = grid[gp]
-				if not pipe_start:
+			if grid[gp] != active_cell:
+				active_cell = grid[gp]
+				if not active_line:
 					grid[gp].try_start_pipe()
 				else:
 					grid[gp].try_connect_to_pipe()
 	else:
-		if pipe_start:
-			end_pipe()			
-
-func end_pipe():
-	if pipe_last:
-		print_debug("end %s" % pipe_last.game_position)
-	else:
-		print('end with no last pos')
-	pipe_start = null
-	pipe_last = null
-	
-func start_pipe():
-	pipe_start = find_start(pipe_current)
-	pipe_last = pipe_current
-	print_debug("start %s" % pipe_current.game_position)
-
-func find_start(cell):
-	if not cell.upstream:
-		return cell
-	return find_start(cell.upstream)
+		if active_line:
+			active_line.end()
 
 
-func set_dots(pos1, pos2, color):
-	var dot1 = set_cell(pos1, dot, color)
-	var dot2 = set_cell(pos2, dot, color)
+func create_line(pos1, pos2, color):
+	var line = Line.new()
+	line.game = self
+	var dot1 = set_cell(pos1, Dot, color)
+	var dot2 = set_cell(pos2, Dot, color)
+	dot1.init_line(line)
+	dot2.init_line(line)
 	dot1.other = dot2
 	dot2.other = dot1
+	line.dots.append(dot1)
+	line.dots.append(dot2)
+	
 
 func set_cell(pos,cell,color):
 	var newcell = cell.instance()

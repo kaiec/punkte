@@ -14,5 +14,11 @@ func _draw():
 	if downstream:
 		draw_connection(downstream)
 		
-func set_empty(new_empty):
+func init_line(value):
+	line = value
+		
+func set_empty(value):
+	return
+	
+func set_line(value):
 	return
