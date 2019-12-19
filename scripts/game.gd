@@ -36,6 +36,13 @@ func _ready():
 				set_cell(Vector2(x,y), Pipe, colors.YELLOW)
 	grid_rect.position = grid_pos
 	grid_rect.size = grid_size * cell_size
+	
+	var touchEvent = InputEventScreenTouch.new()
+	var dragEvent = InputEventScreenDrag.new()
+	InputMap.add_action('touch')
+	InputMap.action_add_event('touch', touchEvent) 
+	InputMap.add_action('drag')
+	InputMap.action_add_event('drag', dragEvent) 
 			
 func _draw():
 	for x in range(grid_size.x):
@@ -54,9 +61,9 @@ func game_pos(pos):
 		return gp
 	
 	
-func _process(delta):
-	if Input.is_mouse_button_pressed(BUTTON_LEFT):
-		var mp = get_global_mouse_position()
+func _input(event):
+	if event is InputEventScreenDrag:
+		var mp = event.position
 		if grid_rect.has_point(mp):
 			var gp = game_pos(mp)
 			if gp != null and grid[gp] != active_cell:
@@ -66,10 +73,11 @@ func _process(delta):
 				else:
 					active_cell = grid[gp]
 					grid[gp].try_connect_to_pipe()
-	else:
+	elif event is InputEventScreenTouch and not event.pressed:
 		if active_line:
 			active_line.end()
-		active_cell = null
+		active_cell = null	
+
 
 
 func create_line(pos1, pos2, color):

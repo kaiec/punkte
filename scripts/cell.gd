@@ -18,23 +18,18 @@ func _ready():
 
 func set_empty(value):
 	empty = value
-	update()
 
 func set_upstream(value):
 	upstream = value
-	update()
 
 func set_downstream(value):
 	downstream = value
-	update()
 
 func set_color(value):
 	color = value
-	update()
 	
 func set_line(value):
 	line = value
-	update()
 
 func set_size(new_size):
 	size = new_size
@@ -45,15 +40,17 @@ func set_size(new_size):
 func empty_cell():
 	if self.upstream:
 		self.upstream.downstream = null
+		self.upstream.update()
 	if self.downstream:
 		self.downstream.upstream = null
+		self.downstream.update()
 	self.upstream = null
 	self.downstream = null
 	if not dot:
 		self.empty = true
 		self.color = Color(1,1,1)
 		self.line = null
-
+	self.update()
 
 func try_start_pipe():
 	if not line: # can only start on an existing line
