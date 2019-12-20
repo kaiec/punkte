@@ -8,33 +8,15 @@
 
 config_version=4
 
-_global_script_classes=[ {
-"base": "KinematicBody2D",
-"class": "Dot",
-"language": "GDScript",
-"path": "res://scripts/dot.gd"
-}, {
-"base": "Node",
-"class": "Line",
-"language": "GDScript",
-"path": "res://scripts/line.gd"
-}, {
-"base": "KinematicBody2D",
-"class": "Pipe",
-"language": "GDScript",
-"path": "res://scripts/pipe.gd"
-} ]
+_global_script_classes=[  ]
 _global_script_class_icons={
-"Dot": "",
-"Line": "",
-"Pipe": ""
+
 }
 
 [application]
 
 config/name="punkte"
 run/main_scene="res://scenes/game.tscn"
-boot_splash/image="res://assets/splash.png"
 config/icon="res://assets/icon.png"
 
 [display]
