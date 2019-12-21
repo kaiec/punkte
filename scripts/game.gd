@@ -3,7 +3,7 @@ extends Node2D
 var icon = preload("res://assets/icon.png")
 
 func _ready():
-	pass	
+	Input.set_use_accumulated_input(false)
 
 
 var pos = Vector2(0,0)
